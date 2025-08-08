@@ -59,12 +59,12 @@ def main():
     # ======= Daftar Link Prediksi per Aspek =======
     st.header("🔗 Link Prediksi Sentimen per Aspek")
     aspek_links = {
-            "Pelayanan Petugas": "https://aspek-sentimen-petugas.streamlit.app",
-            "Pelayanan Ibadah": "https://aspek-sentimen-ibadah.streamlit.app",
-            "Pelayanan Transportasi": "https://aspek-sentimen-transportasi.streamlit.app",
-            "Pelayanan Akomodasi": "https://aspek-sentimen-akomodasi.streamlit.app",
-            "Pelayanan Konsumsi": "https://aspek-sentimen-konsumsi.streamlit.app",
-            "Pelayanan Lainnya": "https://aspek-sentimen-lainnya.streamlit.app"
+            "Pelayanan Petugas": "https://aspek-petugas-csv.streamlit.app/",
+            "Pelayanan Ibadah": "https://aspek-ibadah-csv.streamlit.app",
+            "Pelayanan Transportasi": "https://aspek-transportasi-csv.streamlit.app",
+            "Pelayanan Akomodasi": "https://aspek-akomodasi-csv.streamlit.app",
+            "Pelayanan Konsumsi": "https://aspek-konsumsi-csv.streamlit.app",
+            "Pelayanan Lainnya": "https://aspek-lainnya-csv.streamlit.app"
     }
 
     for aspek, url in aspek_links.items():
