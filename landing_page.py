@@ -50,7 +50,7 @@ def main():
         ### Analisis Opini Publik dengan IndoBERT
         Aplikasi ini menggunakan **transformer model** berbasis IndoBERT untuk memprediksi aspek dan sentimen dari opini publik di media sosial terkait **pelayanan haji tahun 2024**.
         
-        Silakan unggah file `.csv` yang berisi kolom `tweet` untuk dianalisis.
+        Silakan unggah file `.csv` yang berisi kolom `text` untuk dianalisis.
     """)
 
     uploaded_file = st.file_uploader("Unggah file CSV", type="csv")
