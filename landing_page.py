@@ -42,17 +42,35 @@ def preprocess(text, kamus_slang):
     text = ' '.join([kamus_slang.get(word, word) for word in text.split()])
     return text.strip()
 
-# ===================== MAIN APP =====================
-def main():
-    st.set_page_config(layout="centered")
-    st.title("Aplikasi Prediksi Aspek Pelayanan Haji 2024")
-    st.markdown("""
-        ### Analisis Opini Publik dengan IndoBERT
-        Aplikasi ini menggunakan **transformer model** berbasis IndoBERT untuk memprediksi aspek dan sentimen dari opini publik di media sosial terkait **pelayanan haji tahun 2024**.
-        
-        Silakan unggah file `.csv` yang berisi kolom `text` untuk dianalisis.
-    """)
+# ===================== SETUP =====================
+st.set_page_config(layout="centered")
+st.title("Aplikasi Prediksi Aspek Pelayanan Haji 2024")
 
+# ===================== DESKRIPSI APLIKASI =====================
+st.markdown("""
+### Analisis Opini Publik dengan IndoBERT
+Aplikasi ini menggunakan **transformer model** berbasis IndoBERT untuk memprediksi aspek dan sentimen dari opini publik di media sosial terkait **pelayanan haji tahun 2024**.
+
+Silakan unggah file `.csv` yang berisi kolom `tweet` untuk dianalisis.
+""")
+
+# ===================== TAMPILKAN LINK PREDIKSI PER ASPEK =====================
+st.header("🔗 Link Prediksi Sentimen per Aspek")
+aspek_links = {
+    "Pelayanan Petugas": "https://aspek-sentimen-petugas.streamlit.app",
+    "Pelayanan Ibadah": "https://aspek-sentimen-ibadah.streamlit.app",
+    "Pelayanan Transportasi": "https://aspek-sentimen-transportasi.streamlit.app",
+    "Pelayanan Akomodasi": "https://aspek-sentimen-akomodasi.streamlit.app",
+    "Pelayanan Konsumsi": "https://aspek-sentimen-konsumsi.streamlit.app",
+    "Pelayanan Lainnya": "https://aspek-sentimen-lainnya.streamlit.app"
+}
+for aspek, url in aspek_links.items():
+    st.markdown(f"👉 [{aspek}]({url})", unsafe_allow_html=True)
+
+st.markdown("---")
+
+# ===================== MAIN APP UNTUK WORDCLOUD & UPLOAD =====================
+def main():
     uploaded_file = st.file_uploader("Unggah file CSV", type="csv")
 
     if uploaded_file is not None:
@@ -77,22 +95,7 @@ def main():
             st.pyplot(fig)
 
         st.success("Word cloud berhasil ditampilkan!")
-        st.markdown("---")
 
-        # ======= Daftar Link Prediksi per Aspek =======
-        st.header("🔗 Link Prediksi Sentimen per Aspek")
-        aspek_links = {
-            "Pelayanan Petugas": "https://aspek-sentimen-petugas-bsstccnkq6p9jbkatfjnio.streamlit.app",
-            "Pelayanan Ibadah": "https://aspek-sentimen-ibadah-2u6k7kfpadkqm47u5rkc4s.streamlit.app",
-            "Pelayanan Transportasi": "https://aspek-sentimen-transportasi-uukwhjbkmappqzlbyzwfbbo.streamlit.app",
-            "Pelayanan Akomodasi": "https://aspek-sentimen-akomodasi-wbtwj3tex2mnpysxh4awkf.streamlit.app",
-            "Pelayanan Konsumsi": "https://aspek-sentimen-konsumsi-sfrudivexbxwaracbrdrcq.streamlit.app",
-            "Pelayanan Lainnya": "https://aspek-sentimen-lainnya-3rg6z9al9qt7lbrqmmcd7a.streamlit.app"
-        }
-
-        for aspek, url in aspek_links.items():
-            st.markdown(f"👉 [{aspek}]({url})", unsafe_allow_html=True)
-
-# ===================== RUN APP =====================
+# ===================== JALANKAN APP =====================
 if __name__ == '__main__':
     main()
