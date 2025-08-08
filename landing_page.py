@@ -1,88 +1,103 @@
 import streamlit as st
 import pandas as pd
-import plotly.express as px
+import os
+import gdown
+import re
+import string
+from transformers import AutoTokenizer, BertForSequenceClassification, BertConfig
+from wordcloud import WordCloud
+import matplotlib.pyplot as plt
 
-st.set_page_config(page_title="Dashboard Sentimen Pelayanan Haji 2024", layout="wide")
+# ===================== KONSTANTA =====================
+KAMUS_CSV_URL = "https://drive.google.com/uc?id=1fGWZu5qVYJa-pv078spaLE4urs5zDDPV"
+KAMUS_PATH = "kamus.csv"
 
-st.title("📊 Dashboard Sentimen Pelayanan Haji 2024")
+# ===================== UTILITY FUNCTIONS =====================
+def download_kamus():
+    if not os.path.exists(KAMUS_PATH):
+        with st.spinner("Mengunduh kamus slang..."):
+            gdown.download(KAMUS_CSV_URL, KAMUS_PATH, quiet=False)
 
-# ======= Data Dummy Persentase Keseluruhan =======
-overall_sentimen = {
-    'Positif': 270,
-    'Negatif': 542,
-    'Netral': 75
+@st.cache_resource(show_spinner=True)
+def load_tokenizer(folder):
+    return AutoTokenizer.from_pretrained(folder)
+
+@st.cache_resource(show_spinner=True)
+def load_model(folder):
+    config = BertConfig.from_pretrained(folder)
+    model = BertForSequenceClassification.from_pretrained(folder, config=config)
+    model.eval()
+    return model
+
+@st.cache_resource
+def load_kamus():
+    df = pd.read_csv(KAMUS_PATH)
+    return dict(zip(df['slang'], df['formal']))
+
+def preprocess(text, kamus_slang):
+    text = text.lower()
+    text = re.sub(r'http\S+|www\S+|@\S+|#\S+', '', text)
+    text = re.sub(r'\d+', '', text)
+    text = text.translate(str.maketrans('', '', string.punctuation))
+    text = ' '.join([kamus_slang.get(word, word) for word in text.split()])
+    return text.strip()
+
+# ===================== MAIN APP =====================
+def main():
+    st.set_page_config(layout="centered")
+    st.title("Aplikasi Prediksi Aspek Pelayanan Haji 2024")
+    st.markdown("""
+        ### Analisis Opini Publik dengan IndoBERT
+        Aplikasi ini menggunakan **transformer model** berbasis IndoBERT untuk memprediksi aspek dan sentimen dari opini publik di media sosial terkait **pelayanan haji tahun 2024**.
+        
+        Silakan unggah file `.csv` yang berisi kolom `tweet` untuk dianalisis.
+    """)
+
+    uploaded_file = st.file_uploader("Unggah file CSV", type="csv")
+
+    if uploaded_file is not None:
+        df = pd.read_csv(uploaded_file)
+
+        if 'tweet' not in df.columns:
+            st.error("File harus memiliki kolom 'text'.")
+            return
+
+        download_kamus()
+        kamus = load_kamus()
+
+        st.subheader("Word Cloud dari Tweet")
+        with st.spinner("Memproses teks dan membentuk word cloud..."):
+            df['cleaned'] = df['tweet'].astype(str).apply(lambda x: preprocess(x, kamus))
+            all_text = ' '.join(df['cleaned'].tolist())
+            wordcloud = WordCloud(width=800, height=400, background_color='white').generate(all_text)
+
+            fig, ax = plt.subplots(figsize=(10, 5))
+            ax.imshow(wordcloud, interpolation='bilinear')
+            ax.axis("off")
+            st.pyplot(fig)
+
+        st.success("Word cloud berhasil ditampilkan!")
+
+        st.markdown("---")
+
+       # ======= Daftar Link Prediksi per Aspek =======
+st.header("🔗 Link Prediksi Sentimen per Aspek")
+aspek_links = {
+    "Pelayanan Petugas": "https://aspek-petugas-csv.streamlit.app/",
+    "Pelayanan Ibadah": "https://aspek-ibadah-csv.streamlit.app/",
+    "Pelayanan Transportasi": "https://aspek-transportasi-csv.streamlit.app/",
+    "Pelayanan Akomodasi": "https://aspek-akomodasi-csv.streamlit.app/",
+    "Pelayanan Konsumsi": "https://aspek-konsumsi-csv.streamlit.app/",
+    "Pelayanan Lainnya": "https://aspek-lainnya-csv.streamlit.app/"
 }
 
-df_overall = pd.DataFrame({
-    'Sentimen': ['Positif', 'Negatif', 'Netral'],
-    'Jumlah': [270, 542, 75]
-})
+for aspek, url in aspek_links.items():
+    st.markdown(f"👉 [{aspek}]({url})", unsafe_allow_html=True)
 
-colors_overall = ['green', 'red', 'yellow']
+if __name__ == '__main__':
+    main()
 
-fig_overall = px.pie(
-    df_overall, names='Sentimen', values='Jumlah',
-    title='Persentase Sentimen Keseluruhan',
-    category_orders={'Sentimen': ['Positif', 'Negatif', 'Netral']}
-)
 
-fig_overall.update_traces(marker=dict(colors=colors_overall), textposition='inside', textinfo='percent+label')
-
-st.plotly_chart(fig_overall, use_container_width=True)
-
-st.markdown("---")
-
-# ======= Data Dummy Persentase per Aspek =======
-aspek_data = {
-    "Petugas": [203, 97, 12],        # Positif, Negatif, Netral
-    "Ibadah": [156, 75, 4],
-    "Transportasi": [179, 242, 35],
-    "Akomodasi": [190, 378, 51],
-    "Konsumsi": [191, 404, 54],
-    "Lainnya": [177, 242, 39]
-}
-
-aspek_list = list(aspek_data.keys())
-
-colors_per_aspek = ['green', 'red', 'yellow']
-
-st.header("📈 Persentase Sentimen per Aspek")
-for i in range(0, len(aspek_list), 3):
-    cols = st.columns(3)
-    for j, aspek in enumerate(aspek_list[i:i+3]):
-        df = pd.DataFrame({
-            'Sentimen': ['Positif', 'Negatif', 'Netral'],
-            'Jumlah': aspek_data[aspek]
-        })
-        fig = px.pie(
-            df, names='Sentimen', values='Jumlah', title=aspek,
-            category_orders={'Sentimen': ['Positif', 'Negatif', 'Netral']}
-        )
-        fig.update_traces(marker=dict(colors=colors_per_aspek), textposition='inside', textinfo='percent+label')
-        cols[j].plotly_chart(fig, use_container_width=True)
-
-st.markdown("---")
-
-# ======= Word Cloud Per Aspek (3x2) =======
-st.header("☁️ Word Cloud per Aspek")
-for i in range(0, len(aspek_list), 3):
-    cols = st.columns(3)
-    for j, aspek in enumerate(aspek_list[i:i+3]):
-        cols[j].subheader(aspek)
-        img_path = f"wordclouds/{aspek.lower()}.png"  # Pastikan file gambarnya ada
-        cols[j].image(img_path, width=300)
-
-st.markdown("---")
-
-# ======= Word Cloud Sentimen Positif & Negatif (2 kolom) =======
-st.header("☁️ Word Cloud Sentimen Positif & Negatif")
-col1, col2 = st.columns(2)
-col1.subheader("✅ Positif")
-col1.image("wordclouds/positif.png", width=400)
-col2.subheader("❌ Negatif")
-col2.image("wordclouds/negatif.png", width=400)
-
-st.markdown("---")
 
 # ======= Daftar Link Prediksi per Aspek =======
 st.header("🔗 Link Prediksi Sentimen per Aspek")

@@ -1,4 +1,8 @@
 streamlit
+torch
+transformers
 pandas
-plotly
-pillow
+gdown
+matplotlib
+wordcloud
+scikit-learn
