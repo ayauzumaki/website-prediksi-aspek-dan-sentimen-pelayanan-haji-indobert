@@ -98,7 +98,7 @@ def main():
 
         st.subheader("☁️ Word Cloud dari Tweet")
         with st.spinner("Memproses teks dan membentuk word cloud..."):
-            df['cleaned'] = df['tweet'].astype(str).apply(lambda x: preprocess(x, kamus))
+            df['cleaned'] = df['text'].astype(str).apply(lambda x: preprocess(x, kamus))
             all_text = ' '.join(df['cleaned'].tolist())
             wordcloud = WordCloud(width=800, height=400, background_color='white').generate(all_text)
 
