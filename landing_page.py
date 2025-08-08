@@ -59,7 +59,7 @@ def main():
         df = pd.read_csv(uploaded_file)
 
         if 'tweet' not in df.columns:
-            st.error("File harus memiliki kolom 'text'.")
+            st.error("File harus memiliki kolom 'tweet'.")
             return
 
         download_kamus()
@@ -77,38 +77,22 @@ def main():
             st.pyplot(fig)
 
         st.success("Word cloud berhasil ditampilkan!")
-
         st.markdown("---")
 
-       # ======= Daftar Link Prediksi per Aspek =======
-st.header("🔗 Link Prediksi Sentimen per Aspek")
-aspek_links = {
-    "Pelayanan Petugas": "https://aspek-petugas-csv.streamlit.app/",
-    "Pelayanan Ibadah": "https://aspek-ibadah-csv.streamlit.app/",
-    "Pelayanan Transportasi": "https://aspek-transportasi-csv.streamlit.app/",
-    "Pelayanan Akomodasi": "https://aspek-akomodasi-csv.streamlit.app/",
-    "Pelayanan Konsumsi": "https://aspek-konsumsi-csv.streamlit.app/",
-    "Pelayanan Lainnya": "https://aspek-lainnya-csv.streamlit.app/"
-}
+        # ======= Daftar Link Prediksi per Aspek =======
+        st.header("🔗 Link Prediksi Sentimen per Aspek")
+        aspek_links = {
+            "Pelayanan Petugas": "https://aspek-sentimen-petugas-bsstccnkq6p9jbkatfjnio.streamlit.app",
+            "Pelayanan Ibadah": "https://aspek-sentimen-ibadah-2u6k7kfpadkqm47u5rkc4s.streamlit.app",
+            "Pelayanan Transportasi": "https://aspek-sentimen-transportasi-uukwhjbkmappqzlbyzwfbbo.streamlit.app",
+            "Pelayanan Akomodasi": "https://aspek-sentimen-akomodasi-wbtwj3tex2mnpysxh4awkf.streamlit.app",
+            "Pelayanan Konsumsi": "https://aspek-sentimen-konsumsi-sfrudivexbxwaracbrdrcq.streamlit.app",
+            "Pelayanan Lainnya": "https://aspek-sentimen-lainnya-3rg6z9al9qt7lbrqmmcd7a.streamlit.app"
+        }
 
-for aspek, url in aspek_links.items():
-    st.markdown(f"👉 [{aspek}]({url})", unsafe_allow_html=True)
+        for aspek, url in aspek_links.items():
+            st.markdown(f"👉 [{aspek}]({url})", unsafe_allow_html=True)
 
+# ===================== RUN APP =====================
 if __name__ == '__main__':
     main()
-
-
-
-# ======= Daftar Link Prediksi per Aspek =======
-st.header("🔗 Link Prediksi Sentimen per Aspek")
-aspek_links = {
-    "Pelayanan Petugas": "https://aspek-sentimen-petugas-bsstccnkq6p9jbkatfjnio.streamlit.app",
-    "Pelayanan Ibadah": "https://aspek-sentimen-ibadah-2u6k7kfpadkqm47u5rkc4s.streamlit.app",
-    "Pelayanan Transportasi": "https://aspek-sentimen-transportasi-uukwhjbkmappqzlbyzwfbbo.streamlit.app",
-    "Pelayanan Akomodasi": "https://aspek-sentimen-akomodasi-wbtwj3tex2mnpysxh4awkf.streamlit.app",
-    "Pelayanan Konsumsi": "https://aspek-sentimen-konsumsi-sfrudivexbxwaracbrdrcq.streamlit.app",
-    "Pelayanan Lainnya": "https://aspek-sentimen-lainnya-3rg6z9al9qt7lbrqmmcd7a.streamlit.app"
-}
-
-for aspek, url in aspek_links.items():
-    st.markdown(f"👉 [{aspek}]({url})", unsafe_allow_html=True)
