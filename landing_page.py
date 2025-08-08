@@ -82,42 +82,42 @@ def main():
     Word Cloud ini membantu untuk melihat kata-kata atau topik yang sering dibahas oleh masyarakat
     terkait **pelayanan haji tahun 2024**, sebelum dilakukan analisis lebih mendalam.
     """)
-    
-# ======= Upload File =======
-uploaded_file = st.file_uploader("📂 Silakan unggah file `.csv` yang berisi kolom `text` untuk dianalisis.", type="csv")
 
-if uploaded_file is not None:
-    df = pd.read_csv(uploaded_file)
+    # ======= Upload File & Word Cloud =======
+    uploaded_file = st.file_uploader("📂 Silakan unggah file `.csv` yang berisi kolom `text` untuk dianalisis.", type="csv")
 
-    if 'text' not in df.columns:
-        st.error("❌ File harus memiliki kolom 'text'.")
-        return
+    if uploaded_file is not None:
+        df = pd.read_csv(uploaded_file)
 
-    download_kamus()
-    kamus = load_kamus()
+        if 'text' not in df.columns:
+            st.error("❌ File harus memiliki kolom 'text'.")
+            return
 
-    st.subheader("☁️ Word Cloud dari Tweet")
-    with st.spinner("Memproses teks dan membentuk word cloud..."):
-        # Ambil maksimal 1000 data acak
-        sampled_df = df.sample(n=min(1000, len(df)), random_state=42)
+        download_kamus()
+        kamus = load_kamus()
 
-        # Preprocessing kolom 'text'
-        sampled_df['cleaned'] = sampled_df['text'].astype(str).apply(lambda x: preprocess(x, kamus))
-        all_text = ' '.join(sampled_df['cleaned'].tolist())
+        st.subheader("☁️ Word Cloud dari Tweet")
+        with st.spinner("Memproses teks dan membentuk word cloud..."):
+            # Ambil maksimal 1000 data acak
+            sampled_df = df.sample(n=min(1000, len(df)), random_state=42)
 
-        # Batasi jumlah karakter jika terlalu panjang
-        all_text = all_text[:500000]
+            # Preprocessing kolom 'text'
+            sampled_df['cleaned'] = sampled_df['text'].astype(str).apply(lambda x: preprocess(x, kamus))
+            all_text = ' '.join(sampled_df['cleaned'].tolist())
 
-        # Buat WordCloud
-        wordcloud = WordCloud(width=800, height=400, background_color='white').generate(all_text)
+            # Batasi jumlah karakter jika terlalu panjang
+            all_text = all_text[:500000]
 
-        # Tampilkan WordCloud
-        fig, ax = plt.subplots(figsize=(10, 5))
-        ax.imshow(wordcloud, interpolation='bilinear')
-        ax.axis("off")
-        st.pyplot(fig)
+            # Buat WordCloud
+            wordcloud = WordCloud(width=800, height=400, background_color='white').generate(all_text)
 
-    st.success("✅ Word Cloud berhasil ditampilkan!")
+            # Tampilkan WordCloud
+            fig, ax = plt.subplots(figsize=(10, 5))
+            ax.imshow(wordcloud, interpolation='bilinear')
+            ax.axis("off")
+            st.pyplot(fig)
+
+        st.success("✅ Word Cloud berhasil ditampilkan!")
 
 if __name__ == '__main__':
     main()
